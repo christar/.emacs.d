@@ -1,0 +1,261 @@
+#+TITLE: christar's emacs config
+#+OPTIONS: toc:4 h:4
+#+STARTUP: content
+
+* Todo
+** TODO remove all DONE states
+** TODO check all not used codes
+tagged with TBC
+
+* Startup
+** DONE Define Platform 				      :mac:linux:win:
+Define the variable for each platform
+
+#+begin_src emacs-lisp :tangle yes
+(defun mac-p ()
+    (eq system-type 'darwin))
+(defun linux-p ()
+    (eq system-type 'gnu/linux))
+(defun win-p ()
+    (eq system-type 'windows-nt))
+#+end_src
+
+** DONE Startup Window Config						:win:
+Remove Scrollbar on Windows
+Remove Toolbar on Windows
+Remove Welcome Screen
+Remove Beep on Windows
+Fullscreen at startup
+#+begin_src emacs-lisp :tangle yes
+(when (win-p)
+    (setq inhibit-startup-screen t
+          visible-bell 1)
+    (tool-bar-mode -1)
+    (scroll-bar-mode -1))
+;(add-to-list 'default-frame-alist '(fullscreen . maximized))
+#+end_src
+
+** TODO Start a daemon for Emacs as client		      :mac:linux:win:
+For Macos use daemon
+For Linux use tmux
+For Windows use a custom Exe s. Chapter Notes
+** DONE Load Custom Settings					       :work:
+e.g. Work Proxy Server
+
+#+begin_src emacs-lisp :tangle no
+(setq custom-file "~/.emacs.d/custom-settings.el")
+(load custom-file t)
+#+end_src
+
+** DONE ELPA Repo				 :work:mac:linux:win:org:pac:
+GnuTLS manually installed by installing deps package from Emacs FTP server
+
+#+begin_src emacs-lisp :tangle yes
+(require 'package)
+(setq package-enable-at-startup nil)
+
+(add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
+(when (eq (win-p) nil)
+    (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t))
+
+(package-initialize)
+#+end_src
+
+** DONE Use-Package						    :pac:TBC:
+There is a debate between using package.el and use-package.el
+Should look into that later
+
+CHECKME -> bug installing diminish package 
+
+#+begin_src emacs-lisp :tangle yes
+(unless (package-installed-p 'use-package)
+    (package-refresh-contents)
+    (package-install 'use-package))
+(eval-when-compile
+    (defvar use-package-verbose t)
+    (defvar use-package-always-ensure t)
+    (require 'use-package))
+(require 'diminish)
+(unless (package-installed-p 'diminish)
+    (package-refresh-contents)
+    (package-install 'diminish))
+
+(require 'bind-key)
+(use-package auto-compile
+    :config (auto-compile-on-load-mode))
+(setq load-prefer-newer t)
+#+end_src
+** Page Break Line							:TBC:
+#+begin_src emacs-lisp :tangle no
+(use-package page-break-lines
+    :diminish page-break-lines-mode
+    :config (global-page-break-lines-mode 1))
+#+end_src
+** Compress Some Warnings						:TBC:
+#+begin_src emacs-lisp :tangle no
+(setq byte-compile-warnings nil
+    gnutls-min-prime-bits 4096)
+#+end_src
+
+* Appearance
+** WIP Theme						      :org:theme:pac:
+#+begin_src emacs-lisp :tangle no
+(require-package 'grayscale-theme)
+(load-theme 'grayscale t)
+#+end_src
+
+#+begin_src emacs-lisp :tangle no
+(use-package color-theme)
+(defadvice color-theme-alist (around sacha activate)
+  (if (ad-get-arg 0)
+      ad-do-it
+    nil))
+(defun my/setup-color-theme ()
+  (interactive)
+  (when (display-graphic-p)
+     (color-theme-solarized))
+  (set-background-color "black")
+  (set-face-foreground 'secondary-selection "darkblue")
+  (set-face-background 'secondary-selection "lightblue")
+  (set-face-background 'font-lock-doc-face "black")
+  (set-face-foreground 'font-lock-doc-face "wheat")
+  (set-face-background 'font-lock-string-face "black")
+  (set-face-foreground 'org-todo "green")
+  (set-face-background 'org-todo "black"))
+(use-package color-theme-solarized :config (my/setup-color-theme))
+#+end_src
+
+#+begin_src emacs-lisp :tangle no
+(require-package 'zenburn-theme)
+(load-theme 'zenburn t)
+#+end_src
+
+** show curson position						       :edit:
+** background color						      :theme:
+#+begin_src emacs-lisp :tangle yes
+
+#+end_src
+
+** paren highlighting						       :edit:
+#+begin_src emacs-lisp :tangle yes
+(show-paren-mode 1)
+(setq show-paren-delay 0)
+#+end_src
+
+** no wrapping							   :edit:win:
+
+
+* Features
+** Editor
+*** Trailing space                                                     :edit:
+Shown while editing
+Auto remove on save
+*** multiple line comment                                              :edit:
+toggle comment instead of adding header tail (change the behaviour of M-;)
+*** TODO company + clang					     :c:edit:
+if/for statement auto completion
+possible sublime-like fuzzy completion
+parenthese auto pairing
+MAY NEED TO COMPILE CLANG FOR WINDOWS
+*** flycheck                                                         :c:edit:
+
+*** yasnippet                                                        :edit:c:
+
+*** DONE keep backup files in another directory			       :edit:
+File of the same name but with a tilda ~ at the end
+#+begin_src emacs-lisp :tangle no
+(setq backup-directory-alist '(("." . "~/.emacs.d/backup"))
+    backup-by-copying t    ; Don't delink hardlinks
+    version-control t      ; Use version numbers on backups
+    delete-old-versions t  ; Automatically delete excess backups
+    kept-new-versions 20   ; how many of the newest versions to keep
+    kept-old-versions 5    ; and how many of the old
+    )
+#+end_src
+#+begin_src emacs-lisp :tangle no
+(setq make-backup-files nil)
+#+end_src
+
+*** DONE keep auto save files					       :edit:
+File of the same name but with # at both sides
+#+begin_src emacs-lisp :tangle yes
+(setq auto-save-default t)
+#+end_src
+
+*** org mode headline highlighting				   :edit:org:
+*** line highlighting						       :edit:
+
+* Etc
+** DONE config sync between work and home				:win:
+using github
+
+* General
+** !!! jump to any file in a deep folder structure 		 :dired:perf:
+maybe bookmark is used?
+
+** add new headline with C-Newline                                      :win:
+this is an issue with mintty-specific Ctrl behaviour
+either change the keycode or use another terminal emulator
+
+** ivy
+** helm                                                                :helm:
+helm-ag for searching
+** search behavior                                                     :edit:
+how is search handled
+** remember last cursor position in dired & file       :edit:helm:dired:perf:
+when it is not of poor performance
+
+** source code indexing/navigation                                        :c:
+*** function arguments hinting                                       :edit:c:
+*** GNU global + helm-gtags                                          :c:helm:
+prefix + shortkey
+*** add project path (multiple folders)
+
+** reload file automatically when changed 			  :edit:perf:
+file should not be cut weirdly
+** multiple line cursor                                                :edit:
+** undo tree                                                           :edit:
+revokes after hitting q!
+
+** c switch case indentation                                              :c:
+** M-x echo area(minibuffer)
+*** helm window in split windows                                       :helm:
+M-x should be only under the splitted windows, not sure if it is ivy or helm
+*** hint possible hotkey
+*** remember last used emacs function
+*** occur window
+** run build.bat from minibuffer                                          :c:
+** ibuffer instead of list-buffers
+(global-set-key (kbd "C-x C-b") 'ibuffer)
+
+** C-x C-x reactive region                                             :edit:
+** any advantage using swipe?                                          :edit:
+using M-s . / occur is also convenient, maybe use both.
+
+
+** copy modeline.el from Prelude                                      :theme:
+understand what all areas stand for
+
+
+** start emacs in Daemon/ client mode				       :perf:
+
+
+* Org mode
+** agenda path                                                          :org:
+
+** DONE Add TODO Workflow State 					:org:
+Add a WIP state to the TODO workflow and set it to yellow
+#+begin_src emacs-lisp :tangle yes
+(setq org-todo-keywords
+    '((sequence "TODO" "WIP" "|" "DONE")))
+(setq org-todo-keyword-faces
+      '(("WIP" . "yellow")))
+#+end_src
+
+** DoNot automatically remove my newlines!				:org:
+
+* Notes
+** Eclisp
+this is a thing for elisp learning: ";; -*- lexical-binding: t -*-"
+
+** TODO Windows Emacs client
