@@ -1,0 +1,20 @@
+# Compiled
+*.elc
+
+# Packaging
+.cask
+
+# Backup files
+*~
+
+# Undo-tree save-files
+*.~undo-tree
+
+# Generated
+README.el
+custom-settings.el
+
+# Folder
+elpa/
+auto-save-list/
+backup/
