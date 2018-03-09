@@ -26,23 +26,32 @@ Remove Toolbar on Windows
 Remove Welcome Screen
 Remove Beep on Windows
 Fullscreen at startup
+Set Encoding from Windows style(CRLF) to Mac style(CR)
 #+begin_src emacs-lisp :tangle yes
 (when (win-p)
     (setq inhibit-startup-screen t
           visible-bell 1)
     (tool-bar-mode -1)
-    (scroll-bar-mode -1))
-;(add-to-list 'default-frame-alist '(fullscreen . maximized))
+    (scroll-bar-mode -1)
+    (add-to-list 'default-frame-alist '(fullscreen . maximized)))
+(prefer-coding-system 'utf-8-unix)
 #+end_src
 
-** TODO Start a daemon for Emacs as client		      :mac:linux:win:
+** WIP Start a daemon for Emacs as client		      :mac:linux:win:
 For Macos use daemon
 For Linux use tmux
-For Windows use a custom Exe s. Chapter Notes
+For Windows use server
+#+begin_src emacs-lisp :tangle yes
+(require 'server)
+(if (eq system-type 'windows-nt)
+    (or (server-running-p)
+        (server-start)))
+#+end_src
+
 ** DONE Load Custom Settings					       :work:
 e.g. Work Proxy Server
 
-#+begin_src emacs-lisp :tangle no
+#+begin_src emacs-lisp :tangle yes
 (setq custom-file "~/.emacs.d/custom-settings.el")
 (load custom-file t)
 #+end_src
@@ -65,7 +74,7 @@ GnuTLS manually installed by installing deps package from Emacs FTP server
 There is a debate between using package.el and use-package.el
 Should look into that later
 
-CHECKME -> bug installing diminish package 
+CHECKME -> bug installing diminish package
 
 #+begin_src emacs-lisp :tangle yes
 (unless (package-installed-p 'use-package)
@@ -76,10 +85,6 @@ CHECKME -> bug installing diminish package
     (defvar use-package-always-ensure t)
     (require 'use-package))
 (require 'diminish)
-(unless (package-installed-p 'diminish)
-    (package-refresh-contents)
-    (package-install 'diminish))
-
 (require 'bind-key)
 (use-package auto-compile
     :config (auto-compile-on-load-mode))
@@ -126,8 +131,9 @@ CHECKME -> bug installing diminish package
 #+end_src
 
 #+begin_src emacs-lisp :tangle no
-(require-package 'zenburn-theme)
-(load-theme 'zenburn t)
+(use-package 'zenburn-theme
+    :ensure t
+    :config (load-theme 'zenburn t))
 #+end_src
 
 ** show curson position						       :edit:
@@ -163,7 +169,7 @@ MAY NEED TO COMPILE CLANG FOR WINDOWS
 
 *** DONE keep backup files in another directory			       :edit:
 File of the same name but with a tilda ~ at the end
-#+begin_src emacs-lisp :tangle no
+#+begin_src emacs-lisp :tangle yes
 (setq backup-directory-alist '(("." . "~/.emacs.d/backup"))
     backup-by-copying t    ; Don't delink hardlinks
     version-control t      ; Use version numbers on backups
@@ -184,6 +190,13 @@ File of the same name but with # at both sides
 
 *** org mode headline highlighting				   :edit:org:
 *** line highlighting						       :edit:
+
+*** DONE Special File Type Mode					:edit:c:make:
+#+begin_src emacs-lisp :tangle yes
+(add-to-list 'auto-mode-alist '("\\.can\\'" . c-mode))
+(add-to-list 'auto-mode-alist '("\\.cin\\'" . c-mode))
+(add-to-list 'auto-mode-alist '("\\.mak\\'" . makefile-mode))
+#+end_src
 
 * Etc
 ** DONE config sync between work and home				:win:
@@ -214,8 +227,9 @@ prefix + shortkey
 ** reload file automatically when changed 			  :edit:perf:
 file should not be cut weirdly
 ** multiple line cursor                                                :edit:
-** undo tree                                                           :edit:
-revokes after hitting q!
+** WIP undo tree						       :edit:
+(use-package undo-tree
+  :ensure t)
 
 ** c switch case indentation                                              :c:
 ** M-x echo area(minibuffer)

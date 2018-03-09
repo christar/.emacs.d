@@ -18,3 +18,4 @@ custom-settings.el
 elpa/
 auto-save-list/
 backup/
+server/
