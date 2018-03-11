@@ -7,6 +7,7 @@
 ** TODO check all not used codes
 tagged with TBC
 
+
 * Startup
 ** DONE Define Platform 				      :mac:linux:win:
 Define the variable for each platform
@@ -20,20 +21,24 @@ Define the variable for each platform
     (eq system-type 'windows-nt))
 #+end_src
 
-** DONE Startup Window Config						:win:
-Remove Scrollbar on Windows
-Remove Toolbar on Windows
+** DONE Startup Window Config				      :win:mac:linux:
+Hide Scrollbar on Windows
+Hide Toolbar on Windows
+
 Remove Welcome Screen
 Remove Beep on Windows
+Hide Menu Bar
 Fullscreen at startup
 Set Encoding from Windows style(CRLF) to Mac style(CR)
+
 #+begin_src emacs-lisp :tangle yes
 (when (win-p)
-    (setq inhibit-startup-screen t
-          visible-bell 1)
+    (setq inhibit-startup-screen t)
     (tool-bar-mode -1)
     (scroll-bar-mode -1)
     (add-to-list 'default-frame-alist '(fullscreen . maximized)))
+(setq visible-bell 1)
+(menu-bar-mode -1)
 (prefer-coding-system 'utf-8-unix)
 #+end_src
 
@@ -62,11 +67,7 @@ GnuTLS manually installed by installing deps package from Emacs FTP server
 #+begin_src emacs-lisp :tangle yes
 (require 'package)
 (setq package-enable-at-startup nil)
-
 (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
-(when (eq (win-p) nil)
-    (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t))
-
 (package-initialize)
 #+end_src
 
@@ -90,25 +91,7 @@ CHECKME -> bug installing diminish package
     :config (auto-compile-on-load-mode))
 (setq load-prefer-newer t)
 #+end_src
-** Page Break Line							:TBC:
-#+begin_src emacs-lisp :tangle no
-(use-package page-break-lines
-    :diminish page-break-lines-mode
-    :config (global-page-break-lines-mode 1))
-#+end_src
-** Compress Some Warnings						:TBC:
-#+begin_src emacs-lisp :tangle no
-(setq byte-compile-warnings nil
-    gnutls-min-prime-bits 4096)
-#+end_src
-
-* Appearance
 ** WIP Theme						      :org:theme:pac:
-#+begin_src emacs-lisp :tangle no
-(require-package 'grayscale-theme)
-(load-theme 'grayscale t)
-#+end_src
-
 #+begin_src emacs-lisp :tangle no
 (use-package color-theme)
 (defadvice color-theme-alist (around sacha activate)
@@ -131,43 +114,17 @@ CHECKME -> bug installing diminish package
 #+end_src
 
 #+begin_src emacs-lisp :tangle no
-(use-package 'zenburn-theme
+(use-package zenburn-theme
     :ensure t
     :config (load-theme 'zenburn t))
 #+end_src
-
-** show curson position						       :edit:
-** background color						      :theme:
-#+begin_src emacs-lisp :tangle yes
-
+** WIP Compress Some Warnings						:TBC:
+#+begin_src emacs-lisp :tangle no
+(setq byte-compile-warnings nil
+    gnutls-min-prime-bits 4096)
 #+end_src
 
-** paren highlighting						       :edit:
-#+begin_src emacs-lisp :tangle yes
-(show-paren-mode 1)
-(setq show-paren-delay 0)
-#+end_src
-
-** no wrapping							   :edit:win:
-
-
-* Features
-** Editor
-*** Trailing space                                                     :edit:
-Shown while editing
-Auto remove on save
-*** multiple line comment                                              :edit:
-toggle comment instead of adding header tail (change the behaviour of M-;)
-*** TODO company + clang					     :c:edit:
-if/for statement auto completion
-possible sublime-like fuzzy completion
-parenthese auto pairing
-MAY NEED TO COMPILE CLANG FOR WINDOWS
-*** flycheck                                                         :c:edit:
-
-*** yasnippet                                                        :edit:c:
-
-*** DONE keep backup files in another directory			       :edit:
+** DONE keep backup files in another directory 			       :edit:
 File of the same name but with a tilda ~ at the end
 #+begin_src emacs-lisp :tangle yes
 (setq backup-directory-alist '(("." . "~/.emacs.d/backup"))
@@ -182,35 +139,113 @@ File of the same name but with a tilda ~ at the end
 (setq make-backup-files nil)
 #+end_src
 
-*** DONE keep auto save files					       :edit:
+** DONE keep auto save files 					       :edit:
 File of the same name but with # at both sides
 #+begin_src emacs-lisp :tangle yes
 (setq auto-save-default t)
 #+end_src
 
-*** org mode headline highlighting				   :edit:org:
-*** line highlighting						       :edit:
 
-*** DONE Special File Type Mode					:edit:c:make:
+* Editor
+** WIP Curson Position Highlighting				       :edit:
+#+begin_src emacs-lisp :tangle yes
+(use-package beacon
+    :config (beacon-mode 1))
+#+end_src
+
+** DONE Parentheses 						       :edit:
+There is smartparens mode worth noting.
+
+#+begin_src emacs-lisp :tangle yes
+(show-paren-mode 1)
+(setq show-paren-delay 0)
+(electric-pair-mode 1)
+#+end_src
+
+** TODO No Line Wrapping					   :edit:win:
+** DONE Page Break Line							:TBC:
+#+begin_src emacs-lisp :tangle no
+(use-package page-break-lines
+    :diminish page-break-lines-mode
+    :config (global-page-break-lines-mode 1))
+#+end_src
+
+** DONE Trailing space						       :edit:
+Shown while editing
+Auto remove on save
+#+begin_src emacs-lisp :tangle yes
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
+#+end_src
+** TODO multiple line comment					       :edit:
+toggle comment instead of adding header tail (change the behaviour of M-;)
+** WIP company + clang						     :c:edit:
+if/for statement auto completion
+possible sublime-like fuzzy completion
+parenthese auto pairing
+MAY NEED TO COMPILE CLANG FOR WINDOWS
+
+#+begin_src emacs-lisp :tangle yes
+(use-package company
+    :config (add-hook 'prog-mode-hook 'company-mode))
+#+end_src
+
+** DONE Special File Type Mode 					:edit:c:make:
 #+begin_src emacs-lisp :tangle yes
 (add-to-list 'auto-mode-alist '("\\.can\\'" . c-mode))
 (add-to-list 'auto-mode-alist '("\\.cin\\'" . c-mode))
 (add-to-list 'auto-mode-alist '("\\.mak\\'" . makefile-mode))
 #+end_src
 
+
+* File Management
+** Dired
+#+begin_src emacs-lisp :tangle yes
+(setq dired-recursive-deletes 'always)
+(setq dired-recursive-copies 'always)
+#+end_src
+
+
+* todo
+** flycheck 							     :c:edit:
+
+** yasnippet 							     :edit:c:
+
+** line highlighting 						       :edit:
+
+
 * Etc
 ** DONE config sync between work and home				:win:
 using github
+
 
 * General
 ** !!! jump to any file in a deep folder structure 		 :dired:perf:
 maybe bookmark is used?
 
-** add new headline with C-Newline                                      :win:
+** global auto revert mode
+** add new headline with C-Newline 					:win:
 this is an issue with mintty-specific Ctrl behaviour
 either change the keycode or use another terminal emulator
 
-** ivy
+** WIP ivy							       :edit:
+#+begin_src emacs-lisp :tangle no
+(use-package swiper)
+;;(require 'swiper)
+(use-package ivy
+    :config
+    (progn
+        (ivy-mode 1)
+        (setq ivy-use-virtual-buffers t)
+        (setq enable-recursive-minibuffers t)
+        (global-set-key "\C-s" 'swiper)))
+#+end_src
+
+** Which Key
+#+begin_src emacs-lisp :tangle yes
+(use-package which-key
+    :diminish which-key-mode
+    :config (which-key-mode))
+#+end_src
 ** helm                                                                :helm:
 helm-ag for searching
 ** search behavior                                                     :edit:
@@ -227,11 +262,15 @@ prefix + shortkey
 ** reload file automatically when changed 			  :edit:perf:
 file should not be cut weirdly
 ** multiple line cursor                                                :edit:
-** WIP undo tree						       :edit:
+** DONE Undo Tree 						       :edit:
+#+begin_src emacs-lisp :tangle yes
 (use-package undo-tree
-  :ensure t)
-
+    :diminish undo-tree-mode
+    :config (global-undo-tree-mode))
+#+end_src
 ** c switch case indentation                                              :c:
+c offset
+remember global indent-width
 ** M-x echo area(minibuffer)
 *** helm window in split windows                                       :helm:
 M-x should be only under the splitted windows, not sure if it is ivy or helm
