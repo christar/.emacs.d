@@ -1,5 +1,5 @@
 #+TITLE: christar's emacs config
-#+OPTIONS: toc:4 h:4
+#+OPTIONS: toc:2 h:2
 #+STARTUP: content
 
 * Todo
@@ -9,7 +9,7 @@ tagged with TBC
 
 
 * Startup
-** DONE Define Platform 				      :mac:linux:win:
+** DONE define platform                                      :mac:linux:win:
 Define the variable for each platform
 
 #+begin_src emacs-lisp :tangle yes
@@ -21,7 +21,7 @@ Define the variable for each platform
     (eq system-type 'windows-nt))
 #+end_src
 
-** DONE Startup Window Config				      :win:mac:linux:
+** DONE startup config                                       :win:mac:linux:
 Hide Scrollbar on Windows
 Hide Toolbar on Windows
 
@@ -42,7 +42,7 @@ Set Encoding from Windows style(CRLF) to Mac style(CR)
 (prefer-coding-system 'utf-8-unix)
 #+end_src
 
-** WIP Start a daemon for Emacs as client		      :mac:linux:win:
+** WIP start emacs server                                    :mac:linux:win:
 For Macos use daemon
 For Linux use tmux
 For Windows use server
@@ -53,7 +53,7 @@ For Windows use server
         (server-start)))
 #+end_src
 
-** DONE Load Custom Settings					       :work:
+** DONE load custom settings                                          :work:
 e.g. Work Proxy Server
 
 #+begin_src emacs-lisp :tangle yes
@@ -61,7 +61,7 @@ e.g. Work Proxy Server
 (load custom-file t)
 #+end_src
 
-** DONE ELPA Repo				 :work:mac:linux:win:org:pac:
+** DONE ELPA repo                                   :work:mac:linux:win:pac:
 GnuTLS manually installed by installing deps package from Emacs FTP server
 
 #+begin_src emacs-lisp :tangle yes
@@ -71,7 +71,7 @@ GnuTLS manually installed by installing deps package from Emacs FTP server
 (package-initialize)
 #+end_src
 
-** DONE Use-Package						    :pac:TBC:
+** DONE use-package                                                :pac:TBC:
 There is a debate between using package.el and use-package.el
 Should look into that later
 
@@ -88,43 +88,26 @@ CHECKME -> bug installing diminish package
 (require 'diminish)
 (require 'bind-key)
 (use-package auto-compile
-    :config (auto-compile-on-load-mode))
+    :config
+    (auto-compile-on-load-mode)
+    (auto-compile-on-save-mode)
+    (setq auto-compile-display-buffer               nil)
+    (setq auto-compile-mode-line-counter            t)
+    (setq auto-compile-source-recreate-deletes-dest t)
+    (setq auto-compile-toggle-deletes-nonlib-dest   t)
+    (setq auto-compile-update-autoloads             t)
+    (add-hook 'auto-compile-inhibit-compile-hook
+              'auto-compile-inhibit-compile-detached-git-head))
 (setq load-prefer-newer t)
 #+end_src
-** WIP Theme						      :org:theme:pac:
-#+begin_src emacs-lisp :tangle no
-(use-package color-theme)
-(defadvice color-theme-alist (around sacha activate)
-  (if (ad-get-arg 0)
-      ad-do-it
-    nil))
-(defun my/setup-color-theme ()
-  (interactive)
-  (when (display-graphic-p)
-     (color-theme-solarized))
-  (set-background-color "black")
-  (set-face-foreground 'secondary-selection "darkblue")
-  (set-face-background 'secondary-selection "lightblue")
-  (set-face-background 'font-lock-doc-face "black")
-  (set-face-foreground 'font-lock-doc-face "wheat")
-  (set-face-background 'font-lock-string-face "black")
-  (set-face-foreground 'org-todo "green")
-  (set-face-background 'org-todo "black"))
-(use-package color-theme-solarized :config (my/setup-color-theme))
-#+end_src
 
-#+begin_src emacs-lisp :tangle no
-(use-package zenburn-theme
-    :ensure t
-    :config (load-theme 'zenburn t))
-#+end_src
-** WIP Compress Some Warnings						:TBC:
-#+begin_src emacs-lisp :tangle no
+** DONE compress byte compile warnings                                 :pac:
+#+begin_src emacs-lisp :tangle yes
 (setq byte-compile-warnings nil
     gnutls-min-prime-bits 4096)
 #+end_src
 
-** DONE keep backup files in another directory 			       :edit:
+** DONE keep backup files in another directory                        :edit:
 File of the same name but with a tilda ~ at the end
 #+begin_src emacs-lisp :tangle yes
 (setq backup-directory-alist '(("." . "~/.emacs.d/backup"))
@@ -139,21 +122,55 @@ File of the same name but with a tilda ~ at the end
 (setq make-backup-files nil)
 #+end_src
 
-** DONE keep auto save files 					       :edit:
+** DONE keep auto save files                                          :edit:
 File of the same name but with # at both sides
 #+begin_src emacs-lisp :tangle yes
 (setq auto-save-default t)
 #+end_src
 
 
+* UI
+** DONE theme                                                        :theme:
+#+begin_src emacs-lisp :tangle yes
+(use-package spacemacs-theme
+    :defer t
+    :if window-system
+    :init
+    (load-theme 'spacemacs-light t))
+#+end_src
+
+** DONE enable Y/N answer
+#+begin_src emacs-lisp :tangle yes
+(fset 'yes-or-no-p 'y-or-n-p)
+#+end_src
+
+** WIP swiper + ivy                                                   :edit:
+#+begin_src emacs-lisp :tangle yes
+(use-package swiper
+    :defer t
+    :bind ("C-s" . 'swiper))
+(use-package ivy
+    :defer t
+    :config
+    (progn
+        (ivy-mode 1)
+        (setq ivy-use-virtual-buffers t)
+        (setq enable-recursive-minibuffers t)))
+#+end_src
+
+** copy modeline.el from Prelude                                     :theme:
+understand what all areas stand for
+
+
 * Editor
-** WIP Curson Position Highlighting				       :edit:
+** DONE curson position highlighting                                  :edit:
 #+begin_src emacs-lisp :tangle yes
 (use-package beacon
+    :defer t
     :config (beacon-mode 1))
 #+end_src
 
-** DONE Parentheses 						       :edit:
+** DONE parentheses                                                   :edit:
 There is smartparens mode worth noting.
 
 #+begin_src emacs-lisp :tangle yes
@@ -162,23 +179,89 @@ There is smartparens mode worth noting.
 (electric-pair-mode 1)
 #+end_src
 
-** TODO No Line Wrapping					   :edit:win:
-** DONE Page Break Line							:TBC:
+** DONE page break line                                                :TBC:
 #+begin_src emacs-lisp :tangle no
 (use-package page-break-lines
     :diminish page-break-lines-mode
     :config (global-page-break-lines-mode 1))
 #+end_src
 
-** DONE Trailing space						       :edit:
-Shown while editing
-Auto remove on save
+** DONE trailing space                                                :edit:
+auto remove on save
+
 #+begin_src emacs-lisp :tangle yes
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 #+end_src
-** TODO multiple line comment					       :edit:
-toggle comment instead of adding header tail (change the behaviour of M-;)
-** WIP company + clang						     :c:edit:
+
+** DONE toggle (multiple) line comment                              :edit:c:
+#+begin_src emacs-lisp :tangle yes
+(defun comment-or-uncomment-region-or-line ()
+  (interactive)
+  (let ((start (line-beginning-position))
+        (end (line-end-position)))
+    (when (or (not transient-mark-mode) (region-active-p))
+      (setq start (save-excursion
+                    (goto-char (region-beginning))
+                    (beginning-of-line)
+                    (point))
+            end (save-excursion
+                  (goto-char (region-end))
+                  (end-of-line)
+                  (point))))
+    (comment-or-uncomment-region start end)))
+
+(global-set-key (kbd "C-c C-7") 'comment-or-uncomment-region-or-line)
+#+end_src
+
+** DONE undo-tree                                                     :edit:
+#+begin_src emacs-lisp :tangle yes
+(use-package undo-tree
+    :diminish undo-tree-mode
+    :defer t
+    :bind ("C-x u" . undo-tree-visualize)
+    :config (global-undo-tree-mode))
+#+end_src
+
+
+* File Management
+** WIP dired
+#+begin_src emacs-lisp :tangle yes
+(setq dired-recursive-deletes 'always)
+(setq dired-recursive-copies 'always)
+#+end_src
+
+** !!! jump to any file in a deep folder structure              :dired:perf:
+maybe bookmark is used?
+
+** DONE remember last cursor position in dired & file                :dired:
+someone had recentf-mode is activated, so this function is enabled.
+just need to gitignore the recentf file in the .emacs.d folder
+
+
+* Programming
+** DONE special file type mode                                 :edit:c:make:
+#+begin_src emacs-lisp :tangle yes
+(add-to-list 'auto-mode-alist '("\\.can\\'" . c-mode))
+(add-to-list 'auto-mode-alist '("\\.cin\\'" . c-mode))
+(add-to-list 'auto-mode-alist '("\\.mak\\'" . makefile-mode))
+#+end_src
+
+** TODO flycheck                                                    :edit:c:
+
+** TODO yasnippet                                                   :edit:c:
+
+** WIP indentation                                                  :edit:c:
+disable tab to indent globally
+
+#+begin_src emacs-lisp :tangle yes
+(setq-default indent-tabs-mode nil)
+(setq-default tab-width 4) ; default is 8
+(defvaralias 'c-basic-offset 'tab-width)
+(setq c-default-style "linux")
+(c-set-offset 'case-label '+)
+#+end_src
+
+** WIP company + clang                                              :c:edit:
 if/for statement auto completion
 possible sublime-like fuzzy completion
 parenthese auto pairing
@@ -186,117 +269,60 @@ MAY NEED TO COMPILE CLANG FOR WINDOWS
 
 #+begin_src emacs-lisp :tangle yes
 (use-package company
+    :defer t
     :config (add-hook 'prog-mode-hook 'company-mode))
 #+end_src
 
-** DONE Special File Type Mode 					:edit:c:make:
-#+begin_src emacs-lisp :tangle yes
-(add-to-list 'auto-mode-alist '("\\.can\\'" . c-mode))
-(add-to-list 'auto-mode-alist '("\\.cin\\'" . c-mode))
-(add-to-list 'auto-mode-alist '("\\.mak\\'" . makefile-mode))
-#+end_src
-
-
-* File Management
-** Dired
-#+begin_src emacs-lisp :tangle yes
-(setq dired-recursive-deletes 'always)
-(setq dired-recursive-copies 'always)
-#+end_src
-
-
-* todo
-** flycheck 							     :c:edit:
-
-** yasnippet 							     :edit:c:
-
-** line highlighting 						       :edit:
-
-
-* Etc
-** DONE config sync between work and home				:win:
-using github
+** multiple line editing                                               :edit:
 
 
 * General
-** !!! jump to any file in a deep folder structure 		 :dired:perf:
-maybe bookmark is used?
 
-** global auto revert mode
-** add new headline with C-Newline 					:win:
-this is an issue with mintty-specific Ctrl behaviour
-either change the keycode or use another terminal emulator
-
-** WIP ivy							       :edit:
-#+begin_src emacs-lisp :tangle no
-(use-package swiper)
-;;(require 'swiper)
-(use-package ivy
-    :config
-    (progn
-        (ivy-mode 1)
-        (setq ivy-use-virtual-buffers t)
-        (setq enable-recursive-minibuffers t)
-        (global-set-key "\C-s" 'swiper)))
+** DONE global auto revert mode                                       :edit:
+#+begin_src emacs-lisp :tangle yes
+(global-auto-revert-mode t)
 #+end_src
 
-** Which Key
+** DONE which-key
+display available shortkeys in minibuffer popup
+
 #+begin_src emacs-lisp :tangle yes
 (use-package which-key
+    :defer 5
     :diminish which-key-mode
     :config (which-key-mode))
 #+end_src
-** helm                                                                :helm:
-helm-ag for searching
-** search behavior                                                     :edit:
-how is search handled
-** remember last cursor position in dired & file       :edit:helm:dired:perf:
-when it is not of poor performance
 
-** source code indexing/navigation                                        :c:
-*** function arguments hinting                                       :edit:c:
-*** GNU global + helm-gtags                                          :c:helm:
+** helm                                                               :helm:
+helm-ag for searching
+
+** source code indexing/navigation                                       :c:
+*** function arguments hinting                                     :edit:c:
+*** GNU global + helm-gtags                                        :c:helm:
 prefix + shortkey
 *** add project path (multiple folders)
 
-** reload file automatically when changed 			  :edit:perf:
+** reload file automatically when changed                        :edit:perf:
 file should not be cut weirdly
-** multiple line cursor                                                :edit:
-** DONE Undo Tree 						       :edit:
-#+begin_src emacs-lisp :tangle yes
-(use-package undo-tree
-    :diminish undo-tree-mode
-    :config (global-undo-tree-mode))
-#+end_src
-** c switch case indentation                                              :c:
-c offset
-remember global indent-width
+
 ** M-x echo area(minibuffer)
-*** helm window in split windows                                       :helm:
+*** helm window in split windows                                     :helm:
 M-x should be only under the splitted windows, not sure if it is ivy or helm
-*** hint possible hotkey
+*** hint possible hotkey of functions
 *** remember last used emacs function
 *** occur window
-** run build.bat from minibuffer                                          :c:
-** ibuffer instead of list-buffers
-(global-set-key (kbd "C-x C-b") 'ibuffer)
 
-** C-x C-x reactive region                                             :edit:
-** any advantage using swipe?                                          :edit:
-using M-s . / occur is also convenient, maybe use both.
-
-
-** copy modeline.el from Prelude                                      :theme:
-understand what all areas stand for
-
-
-** start emacs in Daemon/ client mode				       :perf:
+** TODO run build.bat from minibuffer                                    :c:
 
 
 * Org mode
-** agenda path                                                          :org:
+** agenda path                                                         :org:
+** DONE use org-indent-mode                                            :org:
+#+begin_src emacs-lisp :tangle yes
+(setq org-startup-indented t)
+#+end_src
 
-** DONE Add TODO Workflow State 					:org:
+** DONE Add TODO Workflow State                                        :org:
 Add a WIP state to the TODO workflow and set it to yellow
 #+begin_src emacs-lisp :tangle yes
 (setq org-todo-keywords
@@ -305,10 +331,7 @@ Add a WIP state to the TODO workflow and set it to yellow
       '(("WIP" . "yellow")))
 #+end_src
 
-** DoNot automatically remove my newlines!				:org:
 
 * Notes
-** Eclisp
+** Elisp
 this is a thing for elisp learning: ";; -*- lexical-binding: t -*-"
-
-** TODO Windows Emacs client
