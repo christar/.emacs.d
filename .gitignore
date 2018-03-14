@@ -7,6 +7,9 @@
 # Backup files
 *~
 
+# Recent file
+recentf
+
 # Undo-tree save-files
 *.~undo-tree
 
@@ -19,3 +22,4 @@ elpa/
 auto-save-list/
 backup/
 server/
+url/

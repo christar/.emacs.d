@@ -2,11 +2,10 @@
 #+OPTIONS: toc:2 h:2
 #+STARTUP: content
 
-* Todo
-** TODO remove all DONE states
-** TODO check all not used codes
+* Todo                                                                  :TBC:
+** remove all DONE states
+** check all not used codes
 tagged with TBC
-
 
 * Startup
 ** DONE define platform                                      :mac:linux:win:
@@ -87,6 +86,7 @@ CHECKME -> bug installing diminish package
     (require 'use-package))
 (require 'diminish)
 (require 'bind-key)
+(package-initialize)
 (use-package auto-compile
     :config
     (auto-compile-on-load-mode)
@@ -95,9 +95,7 @@ CHECKME -> bug installing diminish package
     (setq auto-compile-mode-line-counter            t)
     (setq auto-compile-source-recreate-deletes-dest t)
     (setq auto-compile-toggle-deletes-nonlib-dest   t)
-    (setq auto-compile-update-autoloads             t)
-    (add-hook 'auto-compile-inhibit-compile-hook
-              'auto-compile-inhibit-compile-detached-git-head))
+    (setq auto-compile-update-autoloads             t))
 (setq load-prefer-newer t)
 #+end_src
 
@@ -107,10 +105,11 @@ CHECKME -> bug installing diminish package
     gnutls-min-prime-bits 4096)
 #+end_src
 
-** DONE keep backup files in another directory                        :edit:
+** DONE keep auto backup files                                        :edit:
 File of the same name but with a tilda ~ at the end
+
 #+begin_src emacs-lisp :tangle yes
-(setq backup-directory-alist '(("." . "~/.emacs.d/backup"))
+(setq backup-directory-alist '(("." . "~/.emacs.d/backup/"))
     backup-by-copying t    ; Don't delink hardlinks
     version-control t      ; Use version numbers on backups
     delete-old-versions t  ; Automatically delete excess backups
@@ -118,25 +117,31 @@ File of the same name but with a tilda ~ at the end
     kept-old-versions 5    ; and how many of the old
     )
 #+end_src
-#+begin_src emacs-lisp :tangle no
-(setq make-backup-files nil)
-#+end_src
 
 ** DONE keep auto save files                                          :edit:
 File of the same name but with # at both sides
 #+begin_src emacs-lisp :tangle yes
 (setq auto-save-default t)
+(setq auto-save-file-name-transforms '((".*" "~/.emacs.d/backup/" t)))
 #+end_src
 
-
 * UI
-** DONE theme                                                        :theme:
+** DONE theme                                                    :theme:org:
+Remove theme-specific org-mode headline font settings
 #+begin_src emacs-lisp :tangle yes
 (use-package spacemacs-theme
     :defer t
     :if window-system
     :init
-    (load-theme 'spacemacs-light t))
+    (load-theme 'spacemacs-light t)
+    (custom-theme-set-faces
+       'spacemacs-light
+       '(org-document-title ((t (:weight bold :height 1.2))))
+       '(org-level-1 ((t (:weight semi-bold :height 1.2))))
+       '(org-level-2 ((t (:weight semi-bold :height 1.0))))
+       '(org-level-3 ((t (:weight normal :height 1.0))))
+       '(org-level-4 ((t (:weight normal :height 1.0))))
+       '(org-level-5 ((t (:weight normal :height 1.0))))))
 #+end_src
 
 ** DONE enable Y/N answer
@@ -144,11 +149,17 @@ File of the same name but with # at both sides
 (fset 'yes-or-no-p 'y-or-n-p)
 #+end_src
 
-** WIP swiper + ivy                                                   :edit:
+** DONE swiper                                                        :edit:
+bind search hotkey to swiper
+
 #+begin_src emacs-lisp :tangle yes
 (use-package swiper
     :defer t
     :bind ("C-s" . 'swiper))
+#+end_src
+
+** DONE ivy                                                           :edit:
+#+begin_src emacs-lisp :tangle yes
 (use-package ivy
     :defer t
     :config
@@ -158,8 +169,12 @@ File of the same name but with # at both sides
         (setq enable-recursive-minibuffers t)))
 #+end_src
 
-** copy modeline.el from Prelude                                     :theme:
+** customize modeline                                                 :theme:
 understand what all areas stand for
+#+begin_src emacs-lisp :tangle yes
+(column-number-mode t)
+#+end_src
+
 
 
 * Editor
@@ -193,7 +208,8 @@ auto remove on save
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 #+end_src
 
-** DONE toggle (multiple) line comment                              :edit:c:
+** WIP toggle (multiple) line comment                               :edit:c:
+C++ comment style
 #+begin_src emacs-lisp :tangle yes
 (defun comment-or-uncomment-region-or-line ()
   (interactive)
@@ -222,21 +238,22 @@ auto remove on save
     :config (global-undo-tree-mode))
 #+end_src
 
-
+** TODO flyspell                                                      :edit:
+** prelude-like C-a behavior                                          :edit:
+jump to the beginning word of line
 * File Management
-** WIP dired
+** DONE dired                                                    :TBC:dired:
 #+begin_src emacs-lisp :tangle yes
 (setq dired-recursive-deletes 'always)
 (setq dired-recursive-copies 'always)
 #+end_src
 
-** !!! jump to any file in a deep folder structure              :dired:perf:
+** TODO !!! jump to any file in a deep folder structure         :dired:perf:
 maybe bookmark is used?
 
 ** DONE remember last cursor position in dired & file                :dired:
 someone had recentf-mode is activated, so this function is enabled.
 just need to gitignore the recentf file in the .emacs.d folder
-
 
 * Programming
 ** DONE special file type mode                                 :edit:c:make:
@@ -250,7 +267,7 @@ just need to gitignore the recentf file in the .emacs.d folder
 
 ** TODO yasnippet                                                   :edit:c:
 
-** WIP indentation                                                  :edit:c:
+** DONE indentation                                             :edit:c:TBC:
 disable tab to indent globally
 
 #+begin_src emacs-lisp :tangle yes
@@ -261,7 +278,7 @@ disable tab to indent globally
 (c-set-offset 'case-label '+)
 #+end_src
 
-** WIP company + clang                                              :c:edit:
+** DONE company + clang                                         :c:edit:TBC:
 if/for statement auto completion
 possible sublime-like fuzzy completion
 parenthese auto pairing
@@ -269,12 +286,16 @@ MAY NEED TO COMPILE CLANG FOR WINDOWS
 
 #+begin_src emacs-lisp :tangle yes
 (use-package company
-    :defer t
-    :config (add-hook 'prog-mode-hook 'company-mode))
+    :defer 3
+    :init (global-company-mode))
 #+end_src
 
-** multiple line editing                                               :edit:
-
+** multiple line editing                                              :edit:
+** WIP source code indexing/navigation                                   :c:
+*** function arguments hinting                                     :edit:c:
+*** GNU global + helm-gtags                                        :c:helm:
+prefix + shortkey
+*** add project path (multiple folders)
 
 * General
 
@@ -288,50 +309,73 @@ display available shortkeys in minibuffer popup
 
 #+begin_src emacs-lisp :tangle yes
 (use-package which-key
-    :defer 5
+    :defer 3
     :diminish which-key-mode
     :config (which-key-mode))
 #+end_src
 
 ** helm                                                               :helm:
 helm-ag for searching
-
-** source code indexing/navigation                                       :c:
-*** function arguments hinting                                     :edit:c:
-*** GNU global + helm-gtags                                        :c:helm:
-prefix + shortkey
-*** add project path (multiple folders)
-
-** reload file automatically when changed                        :edit:perf:
-file should not be cut weirdly
-
-** M-x echo area(minibuffer)
-*** helm window in split windows                                     :helm:
+helm window in split windows                                         :helm:
 M-x should be only under the splitted windows, not sure if it is ivy or helm
+** M-x echo area(minibuffer)
 *** hint possible hotkey of functions
 *** remember last used emacs function
 *** occur window
 
-** TODO run build.bat from minibuffer                                    :c:
-
+** run build.bat from minibuffer                                    :c:make:
 
 * Org mode
-** agenda path                                                         :org:
+** TODO org agenda path                                                :org:
+this one is system-specific and should be defined in the custom settings
+#+begin_src emacs-lisp :tangle no
+(setq org-agenda-files '("~/org"))
+#+end_src
+
 ** DONE use org-indent-mode                                            :org:
 #+begin_src emacs-lisp :tangle yes
 (setq org-startup-indented t)
 #+end_src
 
-** DONE Add TODO Workflow State                                        :org:
-Add a WIP state to the TODO workflow and set it to yellow
+** WIP workflow                                                        :org:
+*** DONE add workflow states
 #+begin_src emacs-lisp :tangle yes
 (setq org-todo-keywords
     '((sequence "TODO" "WIP" "|" "DONE")))
 (setq org-todo-keyword-faces
+      '(("TODO" . "red")))
+(setq org-todo-keyword-faces
       '(("WIP" . "yellow")))
+;(setq org-todo-keyword-faces
+;      '(("HOLD" . "red")))
+#+end_src
+
+*** DONE normal C-t action is to close TODO tasks with timestamp
+#+begin_src emacs-lisp :tangle yes
+(setq org-log-done 'time)
+#+end_src
+
+*** TODO setting a shortkey for set workflow state
+#+begin_src emacs-lisp :tangle yes
+#+end_src
+
+** DONE no newline before new heading                                  :org:
+without the added newline on top
+#+begin_src emacs-lisp :tangle yes
+(setf org-blank-before-new-entry '((heading . nil) (plain-list-item . nil)) )
+#+end_src
+
+** DONE open .png files with external app                              :org:
+#+begin_src emacs-lisp :tangle yes
+(add-hook 'org-mode-hook
+    '(lambda ()
+        (setq org-file-apps
+            (append '(
+                      ("\\.png\\'" . default)
+                      ) org-file-apps ))))
 #+end_src
 
 
 * Notes
-** Elisp
+** emacs lisp
 this is a thing for elisp learning: ";; -*- lexical-binding: t -*-"
