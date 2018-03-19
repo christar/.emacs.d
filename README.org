@@ -27,18 +27,17 @@ Hide Toolbar on Windows
 Remove Welcome Screen
 Remove Beep on Windows
 Hide Menu Bar
-Fullscreen at startup
-Set Encoding from Windows style(CRLF) to Mac style(CR)
+Set Encoding from Windows style(CRLF) to Unix style(LF)
 
 #+begin_src emacs-lisp :tangle yes
 (when (win-p)
     (setq inhibit-startup-screen t)
     (tool-bar-mode -1)
-    (scroll-bar-mode -1)
-    (add-to-list 'default-frame-alist '(fullscreen . maximized)))
+    (scroll-bar-mode -1))
 (setq visible-bell 1)
 (menu-bar-mode -1)
 (prefer-coding-system 'utf-8-unix)
+(modify-coding-system-alist 'file "\\.bat\\'" 'utf-8-dos)
 #+end_src
 
 ** WIP start emacs server                                    :mac:linux:win:
@@ -169,7 +168,7 @@ bind search hotkey to swiper
         (setq enable-recursive-minibuffers t)))
 #+end_src
 
-** customize modeline                                                 :theme:
+** customize modeline                                                :theme:
 understand what all areas stand for
 #+begin_src emacs-lisp :tangle yes
 (column-number-mode t)
@@ -278,16 +277,20 @@ disable tab to indent globally
 (c-set-offset 'case-label '+)
 #+end_src
 
-** DONE company + clang                                         :c:edit:TBC:
+** WIP company + clang                                          :c:edit:TBC:
 if/for statement auto completion
+
 possible sublime-like fuzzy completion
-parenthese auto pairing
-MAY NEED TO COMPILE CLANG FOR WINDOWS
+need to input no candidate words
+input ignore casing
+
+install clang for windows
 
 #+begin_src emacs-lisp :tangle yes
 (use-package company
     :defer 3
-    :init (global-company-mode))
+    :init (global-company-mode)
+    :config (setq company-idle-delay 0))
 #+end_src
 
 ** multiple line editing                                              :edit:
@@ -365,13 +368,15 @@ without the added newline on top
 (setf org-blank-before-new-entry '((heading . nil) (plain-list-item . nil)) )
 #+end_src
 
-** DONE open .png files with external app                              :org:
+** DONE open files with external app                                   :org:
 #+begin_src emacs-lisp :tangle yes
 (add-hook 'org-mode-hook
     '(lambda ()
         (setq org-file-apps
             (append '(
                       ("\\.png\\'" . default)
+                      ("\\.ppt\\'" . default)
+                      ("\\.pptx\\'" . default)
                       ) org-file-apps ))))
 #+end_src
 
