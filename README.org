@@ -133,6 +133,7 @@ Remove theme-specific org-mode headline font settings
     :if window-system
     :init
     (load-theme 'spacemacs-light t)
+    (set-face-attribute 'default nil :font "Consolas-11")
     (custom-theme-set-faces
        'spacemacs-light
        '(org-document-title ((t (:weight bold :height 1.2))))
@@ -148,33 +149,62 @@ Remove theme-specific org-mode headline font settings
 (fset 'yes-or-no-p 'y-or-n-p)
 #+end_src
 
-** DONE swiper                                                        :edit:
-bind search hotkey to swiper
+** DONE ivy                                                       :edit:ivy:
+fuzzy search in ivy minibuffer
 
-#+begin_src emacs-lisp :tangle yes
-(use-package swiper
-    :defer t
-    :bind ("C-s" . 'swiper))
-#+end_src
-
-** DONE ivy                                                           :edit:
 #+begin_src emacs-lisp :tangle yes
 (use-package ivy
-    :defer t
+    :defer 1
     :config
     (progn
         (ivy-mode 1)
         (setq ivy-use-virtual-buffers t)
+        (setq ivy-re-builders-alist
+            '((t . ivy--regex-fuzzy)))
         (setq enable-recursive-minibuffers t)))
 #+end_src
 
-** customize modeline                                                :theme:
+** DONE swiper                                                    :edit:ivy:
+bind search hotkey to swiper
+
+#+begin_src emacs-lisp :tangle yes
+(use-package swiper
+    :defer 1
+    :bind ("C-s" . 'swiper))
+#+end_src
+
+** DONE counsel                                                        :ivy:
+#+begin_src emacs-lisp :tangle yes
+(use-package counsel
+    :defer 1
+    :bind
+    (("C-x C-f" . counsel-find-file)
+     ("C-h f" . counsel-describe-function)
+     ("C-h v" . counsel-describe-variable)
+     ("M-x" . counsel-M-x)))
+#+end_src
+
+** TODO customize modeline                                           :theme:
 understand what all areas stand for
 #+begin_src emacs-lisp :tangle yes
 (column-number-mode t)
 #+end_src
 
-
+** DONE split window with different buffers                           :edit:
+#+begin_src emacs-lisp :tangle yes
+(defun hsplit-last-buffer()
+    (interactive)
+    (split-window-below)
+    (other-window 1 nil)
+    (switch-to-next-buffer))
+(global-set-key (kbd "C-x 2") 'hsplit-last-buffer)
+(defun vsplit-last-buffer()
+    (interactive)
+    (split-window-right)
+    (other-window 1 nil)
+    (switch-to-next-buffer))
+(global-set-key (kbd "C-x 3") 'vsplit-last-buffer)
+#+end_src
 
 * Editor
 ** DONE curson position highlighting                                  :edit:
@@ -207,7 +237,7 @@ auto remove on save
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 #+end_src
 
-** WIP toggle (multiple) line comment                               :edit:c:
+** WIP toggle (multiple) line comment                                 :edit:
 C++ comment style
 #+begin_src emacs-lisp :tangle yes
 (defun comment-or-uncomment-region-or-line ()
@@ -295,6 +325,16 @@ install clang for windows
 
 ** multiple line editing                                              :edit:
 ** WIP source code indexing/navigation                                   :c:
+#+begin_src emacs-lisp :tangle yes
+(use-package counsel-gtags
+    :hook cc-mode
+    :bind
+    (("M-t" . counsel-gtags-find-definition)
+     ("M-r" . counsel-gtags-find-reference)
+     ("M-s" . counsel-gtags-find-symbol)
+     ("M-," . counsel-gtags-go-backward)))
+#+end_src
+
 *** function arguments hinting                                     :edit:c:
 *** GNU global + helm-gtags                                        :c:helm:
 prefix + shortkey
@@ -312,24 +352,25 @@ display available shortkeys in minibuffer popup
 
 #+begin_src emacs-lisp :tangle yes
 (use-package which-key
-    :defer 3
+    :defer 2
     :diminish which-key-mode
     :config (which-key-mode))
 #+end_src
 
 ** helm                                                               :helm:
 helm-ag for searching
-helm window in split windows                                         :helm:
+helm window in split windows
 M-x should be only under the splitted windows, not sure if it is ivy or helm
+#+begin_src emacs-lisp :tangle yes
+(use-package helm)
+#+end_src
+
 ** M-x echo area(minibuffer)
-*** hint possible hotkey of functions
-*** remember last used emacs function
-*** occur window
 
 ** run build.bat from minibuffer                                    :c:make:
-
+build.bat is not available yet
 * Org mode
-** TODO org agenda path                                                :org:
+** DONE org agenda path                                                :org:
 this one is system-specific and should be defined in the custom settings
 #+begin_src emacs-lisp :tangle no
 (setq org-agenda-files '("~/org"))
@@ -380,6 +421,12 @@ without the added newline on top
                       ) org-file-apps ))))
 #+end_src
 
+** DONE hotkey for org-agenda
+#+begin_src emacs-lisp :tangle yes
+(add-hook 'org-mode-hook
+    '(lambda ()
+        (local-set-key "\C-ca" 'org-agenda)))
+#+end_src
 
 * Notes
 ** emacs lisp
