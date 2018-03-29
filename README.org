@@ -145,7 +145,7 @@ Remove theme-specific org-mode headline font settings
 #+end_src
 
 ** DONE ivy                                                       :edit:ivy:
-use ivy fuzzy search and flx package for better sorting
+use ivy fuzzy search (except in swiper) and flx package for better sorting
 #+begin_src emacs-lisp :tangle yes
 (use-package flx)
 (use-package ivy
@@ -155,7 +155,8 @@ use ivy fuzzy search and flx package for better sorting
         (ivy-mode 1)
         (setq ivy-use-virtual-buffers t)
         (setq ivy-re-builders-alist
-            '((t . ivy--regex-fuzzy)))
+            '((swiper . ivy--regex-plus)
+              (t . ivy--regex-fuzzy)))
         (setq ivy-initial-inputs-alist nil)
         (setq enable-recursive-minibuffers t)))
 #+end_src
@@ -175,6 +176,7 @@ bind search hotkey to swiper
     :defer 1
     :bind
     (("C-x C-f" . counsel-find-file)
+     ("C-h b" . counsel-descbinds)
      ("C-h f" . counsel-describe-function)
      ("C-h v" . counsel-describe-variable)
      ("M-x" . counsel-M-x)))
@@ -323,7 +325,7 @@ install clang for windows
 
 ** multiple line editing                                              :edit:
 ** WIP source code indexing/navigation                                   :c:
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp :tangle no
 (use-package counsel-gtags
     :hook cc-mode
     :bind
@@ -331,6 +333,33 @@ install clang for windows
      ("M-r" . counsel-gtags-find-reference)
      ("M-s" . counsel-gtags-find-symbol)
      ("M-," . counsel-gtags-go-backward)))
+#+end_src
+#+begin_src emacs-lisp :tangle no
+(use-package ggtags
+    :hook cc-mode
+    :bind
+    (("C-c g s" . ggtags-find-other-symbol)
+     ("C-c g h" . ggtags-view-tag-history)
+     ("C-c g r" . ggtags-find-reference)
+     ("C-c g f" . ggtags-find-file)
+     ("C-c g c" . ggtags-create-tags)
+     ("C-c g u" . ggtags-update-tags))
+    :config
+    (ggtags-mode 1))
+#+end_src
+#+begin_src emacs-lisp :tangle yes
+(use-package helm-gtags
+    :hook cc-mode
+    :bind
+    (("M-," . helm-gtags-dwim))
+    :config
+    (setq
+         helm-gtags-ignore-case t
+         helm-gtags-auto-update t
+         helm-gtags-use-input-at-cursor t
+         helm-gtags-pulse-at-cursor t
+         helm-gtags-prefix-key "\C-cg"
+         helm-gtags-suggested-key-mapping t))
 #+end_src
 
 *** function arguments hinting                                     :edit:c:
@@ -360,7 +389,9 @@ display available shortkeys in minibuffer popup
 helm-ag for searching
 helm window in split windows
 #+begin_src emacs-lisp :tangle yes
-(use-package helm)
+(use-package helm
+    :config
+    (setq helm-use-frame-when-more-than-two-windows nil))
 #+end_src
 
 * Org mode
@@ -383,7 +414,7 @@ this one is system-specific and should be defined in the custom settings
 (setq org-todo-keyword-faces
       '(("TODO" . "red")))
 (setq org-todo-keyword-faces
-      '(("WIP" . "yellow")))
+      '(("WIP" . "blue")))
 ;(setq org-todo-keyword-faces
 ;      '(("HOLD" . "red")))
 #+end_src
