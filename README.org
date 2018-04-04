@@ -2,13 +2,8 @@
 #+OPTIONS: toc:2 h:2
 #+STARTUP: content
 
-* Todo                                                                  :TBC:
-** remove all DONE states
-** check all not used codes
-tagged with TBC
-
-* Startup
-** DONE define platform                                      :mac:linux:win:
+* DONE Startup
+** define platform                                           :mac:linux:win:
 Define the variable for each platform
 
 #+begin_src emacs-lisp :tangle yes
@@ -20,9 +15,10 @@ Define the variable for each platform
     (eq system-type 'windows-nt))
 #+end_src
 
-** DONE startup config                                       :win:mac:linux:
+** startup config                                            :win:mac:linux:
 Hide Scrollbar on Windows
 Hide Toolbar on Windows
+Hide ^M on Windows
 
 Remove Welcome Screen
 Remove Beep on Windows
@@ -32,15 +28,20 @@ Set Encoding from Windows style(CRLF) to Unix style(LF)
 #+begin_src emacs-lisp :tangle yes
 (when (win-p)
     (tool-bar-mode -1)
-    (scroll-bar-mode -1))
+    (scroll-bar-mode -1)
+    (blink-cursor-mode 0))
 (setq inhibit-startup-screen t)
 (setq visible-bell 1)
 (menu-bar-mode -1)
+(when (win-p)
+    (interactive)
+    (setq buffer-display-table (make-display-table))
+    (aset buffer-display-table ?\^M []))
 (prefer-coding-system 'utf-8-unix)
 (modify-coding-system-alist 'file "\\.bat\\'" 'utf-8-dos)
 #+end_src
 
-** DONE emacs server                                                   :win:
+** emacs server                                                        :win:
 #+begin_src emacs-lisp :tangle yes
 (require 'server)
 (if (eq system-type 'windows-nt)
@@ -48,7 +49,7 @@ Set Encoding from Windows style(CRLF) to Unix style(LF)
         (server-start)))
 #+end_src
 
-** DONE load custom settings                                          :work:
+** load custom settings                                               :work:
 e.g. Work Proxy Server
 
 #+begin_src emacs-lisp :tangle yes
@@ -56,7 +57,7 @@ e.g. Work Proxy Server
 (load custom-file t)
 #+end_src
 
-** DONE ELPA repo                                   :work:mac:linux:win:pac:
+** ELPA repo                                        :work:mac:linux:win:pac:
 GnuTLS manually installed by installing deps package from Emacs FTP server
 
 #+begin_src emacs-lisp :tangle yes
@@ -66,7 +67,7 @@ GnuTLS manually installed by installing deps package from Emacs FTP server
 (package-initialize)
 #+end_src
 
-** DONE use-package                                                :pac:TBC:
+** use-package                                                     :pac:TBC:
 There is a debate between using package.el and use-package.el
 Should look into that later
 
@@ -93,13 +94,13 @@ CHECKME -> bug installing diminish package
 (setq load-prefer-newer t)
 #+end_src
 
-** DONE compress byte compile warnings                                 :pac:
+** compress byte compile warnings                                      :pac:
 #+begin_src emacs-lisp :tangle yes
 (setq byte-compile-warnings nil
     gnutls-min-prime-bits 4096)
 #+end_src
 
-** DONE keep auto backup files                                        :edit:
+** keep auto backup files                                             :edit:
 File of the same name but with a tilda ~ at the end
 
 #+begin_src emacs-lisp :tangle yes
@@ -112,15 +113,15 @@ File of the same name but with a tilda ~ at the end
     )
 #+end_src
 
-** DONE keep auto save files                                          :edit:
+** keep auto save files                                               :edit:
 File of the same name but with # at both sides
 #+begin_src emacs-lisp :tangle yes
 (setq auto-save-default t)
 (setq auto-save-file-name-transforms '((".*" "~/.emacs.d/backup/" t)))
 #+end_src
 
-* UI
-** DONE theme                                                    :theme:org:
+* DONE UI
+** theme                                                         :theme:org:
 Remove theme-specific org-mode headline font settings
 #+begin_src emacs-lisp :tangle yes
 (use-package spacemacs-theme
@@ -139,12 +140,22 @@ Remove theme-specific org-mode headline font settings
        '(org-level-5 ((t (:weight normal :height 1.0))))))
 #+end_src
 
-** DONE enable Y/N answer
+** enable Y/N answer
 #+begin_src emacs-lisp :tangle yes
 (fset 'yes-or-no-p 'y-or-n-p)
 #+end_src
 
-** DONE ivy                                                       :edit:ivy:
+** which-key
+display available shortkeys in minibuffer popup
+
+#+begin_src emacs-lisp :tangle yes
+(use-package which-key
+    :defer 2
+    :diminish which-key-mode
+    :config (which-key-mode))
+#+end_src
+
+** ivy                                                            :edit:ivy:
 use ivy fuzzy search (except in swiper) and flx package for better sorting
 #+begin_src emacs-lisp :tangle yes
 (use-package flx)
@@ -161,7 +172,7 @@ use ivy fuzzy search (except in swiper) and flx package for better sorting
         (setq enable-recursive-minibuffers t)))
 #+end_src
 
-** DONE swiper                                                    :edit:ivy:
+** swiper                                                         :edit:ivy:
 bind search hotkey to swiper
 
 #+begin_src emacs-lisp :tangle yes
@@ -170,7 +181,7 @@ bind search hotkey to swiper
     :bind ("C-s" . 'swiper))
 #+end_src
 
-** DONE counsel                                                        :ivy:
+** counsel                                                             :ivy:
 #+begin_src emacs-lisp :tangle yes
 (use-package counsel
     :defer 1
@@ -182,13 +193,13 @@ bind search hotkey to swiper
      ("M-x" . counsel-M-x)))
 #+end_src
 
-** WIP customize modeline                                            :theme:
+** customize modeline                                                :theme:
 understand what all areas stand for
 #+begin_src emacs-lisp :tangle yes
 (column-number-mode t)
 #+end_src
 
-** DONE split window with different buffers                           :edit:
+** split window with different buffers                                :edit:
 #+begin_src emacs-lisp :tangle yes
 (defun hsplit-last-buffer()
     (interactive)
@@ -204,15 +215,22 @@ understand what all areas stand for
 (global-set-key (kbd "C-x 3") 'vsplit-last-buffer)
 #+end_src
 
-* Editor
-** DONE curson position highlighting                                  :edit:
+* DONE Editor
+** curson position highlighting                                       :edit:
 #+begin_src emacs-lisp :tangle yes
 (use-package beacon
     :defer t
     :config (beacon-mode 1))
 #+end_src
 
-** DONE parentheses                                                   :edit:
+** move cursor line by line                                           :edit:
+#+begin_src emacs-lisp :tangle yes
+(setq scroll-preserve-screen-position 1)
+(global-set-key (kbd "M-n") (kbd "C-u 1 C-v"))
+(global-set-key (kbd "M-p") (kbd "C-u 1 M-v"))
+#+end_src
+
+** parentheses                                                        :edit:
 There is smartparens mode worth noting.
 
 #+begin_src emacs-lisp :tangle yes
@@ -221,21 +239,21 @@ There is smartparens mode worth noting.
 (electric-pair-mode 1)
 #+end_src
 
-** DONE page break line                                                :TBC:
+** page break line                                                     :TBC:
 #+begin_src emacs-lisp :tangle no
 (use-package page-break-lines
     :diminish page-break-lines-mode
     :config (global-page-break-lines-mode 1))
 #+end_src
 
-** DONE trailing space                                                :edit:
+** trailing space                                                     :edit:
 auto remove on save
 
 #+begin_src emacs-lisp :tangle yes
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 #+end_src
 
-** DONE toggle (multiple) line comment                              :edit:c:
+** toggle (multiple) line comment                                   :edit:c:
 global keybind will be shadowed by local mode keymap
 #+begin_src emacs-lisp :tangle yes
 (defun comment-or-uncomment-region-or-line ()
@@ -260,7 +278,7 @@ global keybind will be shadowed by local mode keymap
 ;;(global-set-key (kbd "C-c c") 'comment-or-uncomment-region-or-line)
 #+end_src
 
-** DONE undo-tree                                                     :edit:
+** undo-tree                                                          :edit:
 #+begin_src emacs-lisp :tangle yes
 (use-package undo-tree
     :diminish undo-tree-mode
@@ -269,9 +287,34 @@ global keybind will be shadowed by local mode keymap
     :config (global-undo-tree-mode))
 #+end_src
 
-** flyspell                                                           :edit:
+** TODO flyspell                                                      :edit:
 ** prelude-like C-a behavior                                          :edit:
-jump to the beginning word of line
+first press to the non-whitespace char of a line and then to beginning
+shadowed by org-beginning-of-line in org-mode
+#+begin_src emacs-lisp :tangle yes
+(defun smarter-move-beginning-of-line (arg)
+  (interactive "^p")
+  (setq arg (or arg 1))
+
+  ;; Move lines first
+  (when (/= arg 1)
+    (let ((line-move-visual nil))
+      (forward-line (1- arg))))
+
+  (let ((orig-point (point)))
+    (back-to-indentation)
+    (when (= orig-point (point))
+      (move-beginning-of-line 1))))
+
+(global-set-key [remap move-beginning-of-line]
+                'smarter-move-beginning-of-line)
+#+end_src
+
+** global auto revert mode                                            :edit:
+#+begin_src emacs-lisp :tangle yes
+(global-auto-revert-mode t)
+#+end_src
+
 * File Management
 ** DONE dired                                                    :TBC:dired:
 #+begin_src emacs-lisp :tangle yes
@@ -287,7 +330,7 @@ someone had recentf-mode is activated, so this function is enabled.
 just need to gitignore the recentf file in the .emacs.d folder
 
 * Programming
-** DONE special file type mode                                 :edit:c:make:
+** DONE special type syntax highlighting                       :edit:c:make:
 #+begin_src emacs-lisp :tangle yes
 (add-to-list 'auto-mode-alist '("\\.can\\'" . c-mode))
 (add-to-list 'auto-mode-alist '("\\.cin\\'" . c-mode))
@@ -295,7 +338,17 @@ just need to gitignore the recentf file in the .emacs.d folder
 #+end_src
 
 ** TODO flycheck                                                    :edit:c:
-** TODO yasnippet                                                   :edit:c:
+** WIP yasnippet                                                    :edit:c:
+#+begin_src emacs-lisp :tangle yes
+(use-package yasnippet-snippets)
+(use-package yasnippet
+    :commands (yas-minor-mode)
+    :init
+    (progn (add-hook 'prog-mode-hook #'yas-minor-mode))
+    :config
+    (yas-reload-all))
+#+end_src
+
 ** DONE indentation                                             :edit:c:TBC:
 disable tab to indent globally
 
@@ -314,8 +367,6 @@ possible sublime-like fuzzy completion
 need to input no candidate words
 input ignore casing
 
-install clang for windows
-
 #+begin_src emacs-lisp :tangle yes
 (use-package company
     :defer 3
@@ -324,35 +375,18 @@ install clang for windows
 #+end_src
 
 ** multiple line editing                                              :edit:
-** WIP source code indexing/navigation                                   :c:
-#+begin_src emacs-lisp :tangle no
-(use-package counsel-gtags
-    :hook cc-mode
-    :bind
-    (("M-t" . counsel-gtags-find-definition)
-     ("M-r" . counsel-gtags-find-reference)
-     ("M-s" . counsel-gtags-find-symbol)
-     ("M-," . counsel-gtags-go-backward)))
-#+end_src
-#+begin_src emacs-lisp :tangle no
-(use-package ggtags
-    :hook cc-mode
-    :bind
-    (("C-c g s" . ggtags-find-other-symbol)
-     ("C-c g h" . ggtags-view-tag-history)
-     ("C-c g r" . ggtags-find-reference)
-     ("C-c g f" . ggtags-find-file)
-     ("C-c g c" . ggtags-create-tags)
-     ("C-c g u" . ggtags-update-tags))
-    :config
-    (ggtags-mode 1))
-#+end_src
+** DONE source code indexing/navigation                                  :c:
 #+begin_src emacs-lisp :tangle yes
 (use-package helm-gtags
     :hook cc-mode
     :bind
-    (("M-," . helm-gtags-dwim))
+    (("C-j" . helm-gtags-select)
+     ("M-." . helm-gtags-dwim)
+     ("M-," . helm-gtags-pop-stack)
+     ("C-c <" . helm-gtags-previous-history)
+     ("C-c >" . helm-gtags-next-history))
     :config
+    (helm-gtags-mode 1)
     (setq
          helm-gtags-ignore-case t
          helm-gtags-auto-update t
@@ -369,32 +403,16 @@ prefix + shortkey
 
 ** run build.bat from minibuffer                                    :c:make:
 build.bat is not available yet
-* General
-** DONE global auto revert mode                                       :edit:
-#+begin_src emacs-lisp :tangle yes
-(global-auto-revert-mode t)
-#+end_src
-
-** DONE which-key
-display available shortkeys in minibuffer popup
-
-#+begin_src emacs-lisp :tangle yes
-(use-package which-key
-    :defer 2
-    :diminish which-key-mode
-    :config (which-key-mode))
-#+end_src
-
-** TODO helm                                                          :helm:
+** WIP helm                                                           :helm:
 helm-ag for searching
 helm window in split windows
 #+begin_src emacs-lisp :tangle yes
 (use-package helm
     :config
-    (setq helm-use-frame-when-more-than-two-windows nil))
+    (setq helm-split-window-in-side-p t))
 #+end_src
 
-* Org mode
+* DONE Org mode
 ** add org agenda path to custom settings                              :org:
 this one is system-specific and should be defined in the custom settings
 
@@ -449,6 +467,6 @@ without the added newline on top
         (local-set-key (kbd "C-c a") 'org-agenda)))
 #+end_src
 
-* Notes
+* DONE Notes
 ** emacs lisp
 this is a thing for elisp learning: ";; -*- lexical-binding: t -*-"
