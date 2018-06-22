@@ -23,3 +23,6 @@ auto-save-list/
 backup/
 server/
 url/
+
+# Auto-generated files
+.mc-lists.el

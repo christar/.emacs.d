@@ -121,7 +121,7 @@ File of the same name but with # at both sides
 * DONE UI
 ** theme                                                         :theme:org:
 Remove theme-specific org-mode headline font settings
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp :tangle no
 (use-package spacemacs-theme
     :defer t
     :if window-system
@@ -136,6 +136,14 @@ Remove theme-specific org-mode headline font settings
        '(org-level-3 ((t (:weight normal :height 1.0))))
        '(org-level-4 ((t (:weight normal :height 1.0))))
        '(org-level-5 ((t (:weight normal :height 1.0))))))
+#+end_src
+#+begin_src emacs-lisp :tangle yes
+(use-package spacemacs-theme
+    :defer t
+    :if window-system
+    :init
+    (load-theme 'spacemacs-dark t)
+    (set-face-attribute 'default nil :font "Consolas-11"))
 #+end_src
 #+begin_src emacs-lisp :tangle no
 (use-package dracula-theme
@@ -348,7 +356,9 @@ just need to gitignore the recentf file in the .emacs.d folder
 (use-package neotree
     :config
     (global-set-key [f8] 'neotree-toggle)
-    (setq neo-theme 'arrow))
+    (setq neo-theme 'arrow
+          neo-window-fixed-size t
+          neo-window-width 50))
 #+end_src
 
 * Programming
