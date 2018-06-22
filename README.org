@@ -137,6 +137,13 @@ Remove theme-specific org-mode headline font settings
        '(org-level-4 ((t (:weight normal :height 1.0))))
        '(org-level-5 ((t (:weight normal :height 1.0))))))
 #+end_src
+#+begin_src emacs-lisp :tangle no
+(use-package dracula-theme
+    :defer t
+    :if window-system
+    :init
+    (load-theme 'dracula t))
+#+end_src
 
 ** enable Y/N answer
 #+begin_src emacs-lisp :tangle yes
@@ -336,6 +343,13 @@ maybe bookmark is used?
 ** DONE remember last cursor position in dired & file                :dired:
 someone had recentf-mode is activated, so this function is enabled.
 just need to gitignore the recentf file in the .emacs.d folder
+** DONE NeoTree                                                    :project:
+#+begin_src emacs-lisp :tangle yes
+(use-package neotree
+    :config
+    (global-set-key [f8] 'neotree-toggle)
+    (setq neo-theme 'arrow))
+#+end_src
 
 * Programming
 ** DONE special type syntax highlighting                       :edit:c:make:
