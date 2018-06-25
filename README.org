@@ -163,7 +163,7 @@ display available shortkeys in minibuffer popup
 
 #+begin_src emacs-lisp :tangle yes
 (use-package which-key
-    :defer 2
+    :defer 15
     :diminish which-key-mode
     :config (which-key-mode))
 #+end_src
@@ -173,7 +173,7 @@ use ivy fuzzy search (except in swiper) and flx package for better sorting
 #+begin_src emacs-lisp :tangle yes
 (use-package flx)
 (use-package ivy
-    :defer 1
+    :defer 5
     :config
     (progn
         (ivy-mode 1)
@@ -190,14 +190,14 @@ bind search hotkey to swiper
 
 #+begin_src emacs-lisp :tangle yes
 (use-package swiper
-    :defer 1
+    :defer t
     :bind ("C-s" . 'swiper))
 #+end_src
 
 ** counsel                                                             :ivy:
 #+begin_src emacs-lisp :tangle yes
 (use-package counsel
-    :defer 1
+    :defer 5
     :bind
     (("C-x C-f" . counsel-find-file)
      ("C-h b" . counsel-descbinds)
@@ -331,6 +331,7 @@ shadowed by org-beginning-of-line in org-mode
 ** highlight current symbol
 #+begin_src emacs-lisp :tangle yes
 (use-package highlight-symbol
+    :defer 10
     :config
     (global-set-key [(control f3)] 'highlight-symbol-next)
     (global-set-key [f3] 'highlight-symbol)
@@ -345,8 +346,8 @@ shadowed by org-beginning-of-line in org-mode
 (setq dired-recursive-copies 'always)
 #+end_src
 
-** TODO !!! jump to any file in a deep folder structure         :dired:perf:
-maybe bookmark is used?
+** WIP !!! jump to any file in a deep folder structure          :dired:perf:
+projectile
 
 ** DONE remember last cursor position in dired & file                :dired:
 someone had recentf-mode is activated, so this function is enabled.
@@ -356,9 +357,18 @@ just need to gitignore the recentf file in the .emacs.d folder
 (use-package neotree
     :config
     (global-set-key [f8] 'neotree-toggle)
-    (setq neo-theme 'arrow
-          neo-window-fixed-size t
-          neo-window-width 50))
+    (setq neo-theme 'ascii
+          neo-window-fixed-size nil
+          neo-window-width 30
+          neo-modern-sidebar t
+          neo-smart-open t)
+    (eval-after-load "neotree"
+    '(add-to-list 'window-size-change-functions
+                  (lambda (frame)
+                    (let ((neo-window (neo-global--get-window)))
+                      (unless (null neo-window)
+                        (setq neo-window-width (window-width neo-window)))))))
+    )
 #+end_src
 
 * Programming
@@ -371,12 +381,13 @@ just need to gitignore the recentf file in the .emacs.d folder
 
 ** TODO flycheck                                                    :edit:c:
 ** WIP yasnippet                                                    :edit:c:
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp :tangle no
 (use-package yasnippet-snippets)
 (use-package yasnippet
     :commands (yas-minor-mode)
     :init
     (progn (add-hook 'prog-mode-hook #'yas-minor-mode))
+    :defer 15
     :config
     (yas-reload-all))
 #+end_src
@@ -401,7 +412,7 @@ input ignore casing
 
 #+begin_src emacs-lisp :tangle yes
 (use-package company
-    :defer t
+    :defer 10
     :init (add-hook 'after-init-hook 'global-company-mode)
     :config
     (use-package company-irony :ensure t :defer t)
@@ -448,6 +459,7 @@ input ignore casing
 ** DONE source code indexing/navigation                                  :c:
 #+begin_src emacs-lisp :tangle yes
 (use-package helm-gtags
+    :defer t
     :hook cc-mode
     :bind
     (("C-j" . helm-gtags-select)
@@ -472,7 +484,7 @@ prefix + shortkey
 *** add project path (multiple folders)
 
 ** run build.bat from minibuffer                                    :c:make:
-build.bat is not available yet
+build.bat is to be created
 ** WIP helm                                                           :helm:
 helm-ag for searching
 helm window in split windows
