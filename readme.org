@@ -61,8 +61,8 @@ GnuTLS manually installed by installing deps package from Emacs FTP server
 (setq package-enable-at-startup nil)
 (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
 (package-initialize)
-(unless package-archive-contents
-  (package-refresh-contents))
+;(unless package-archive-contents
+;  (package-refresh-contents))
 #+end_src
 
 ** use-package                                                     :pac:TBC:
@@ -76,8 +76,8 @@ CHECKME -> bug installing diminish package
     (package-refresh-contents)
     (package-install 'use-package))
 (eval-when-compile
-    (defvar use-package-verbose t)
-    (defvar use-package-always-ensure t)
+    (setq use-package-verbose t)
+    (setq use-package-always-ensure t)
     (require 'use-package))
 (use-package diminish)
 #+end_src
@@ -399,7 +399,8 @@ input ignore casing
     :defer 10
     :init (add-hook 'after-init-hook 'global-company-mode)
     :config
-    (use-package company-irony :ensure t :defer t)
+    (use-package company-irony 
+        :defer t)
     (setq company-idle-delay            0
 	    company-minimum-prefix-length   2
 	    company-show-numbers            t
