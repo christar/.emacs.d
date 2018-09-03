@@ -80,6 +80,9 @@ CHECKME -> bug installing diminish package
     (defvar use-package-always-ensure t)
     (require 'use-package))
 (use-package diminish)
+#+end_src
+
+#+begin_src emacs-lisp :tangle no
 (use-package auto-compile
     :config
     (auto-compile-on-load-mode)
@@ -92,8 +95,11 @@ CHECKME -> bug installing diminish package
 (setq load-prefer-newer t)
 #+end_src
 
-** compress byte compile warnings                                      :pac:
+** compress byte compile warnings                                       :pac:
 #+begin_src emacs-lisp :tangle yes
+(setq warning-minimum-level :error)
+#+end_src
+#+begin_src emacs-lisp :tangle no
 (setq byte-compile-warnings nil
     gnutls-min-prime-bits 4096)
 #+end_src
@@ -119,45 +125,6 @@ File of the same name but with # at both sides
 #+end_src
 
 * DONE UI
-** theme                                                         :theme:org:
-Remove theme-specific org-mode headline font settings
-#+begin_src emacs-lisp :tangle no
-(use-package spacemacs-theme
-    :defer t
-    :if window-system
-    :init
-    (load-theme 'spacemacs-light t)
-    (set-face-attribute 'default nil :font "Consolas-11")
-    (custom-theme-set-faces
-       'spacemacs-light
-       '(org-document-title ((t (:weight bold :height 1.2))))
-       '(org-level-1 ((t (:weight semi-bold :height 1.2))))
-       '(org-level-2 ((t (:weight semi-bold :height 1.0))))
-       '(org-level-3 ((t (:weight normal :height 1.0))))
-       '(org-level-4 ((t (:weight normal :height 1.0))))
-       '(org-level-5 ((t (:weight normal :height 1.0))))))
-#+end_src
-#+begin_src emacs-lisp :tangle yes
-(use-package spacemacs-theme
-    :defer t
-    :if window-system
-    :init
-    (load-theme 'spacemacs-dark t)
-    (set-face-attribute 'default nil :font "Consolas-11"))
-#+end_src
-#+begin_src emacs-lisp :tangle no
-(use-package dracula-theme
-    :defer t
-    :if window-system
-    :init
-    (load-theme 'dracula t))
-#+end_src
-
-** enable Y/N answer
-#+begin_src emacs-lisp :tangle yes
-(fset 'yes-or-no-p 'y-or-n-p)
-#+end_src
-
 ** which-key
 display available shortkeys in minibuffer popup
 
@@ -167,6 +134,23 @@ display available shortkeys in minibuffer popup
     :diminish which-key-mode
     :config (which-key-mode))
 #+end_src
+
+** theme                                                         :theme:org:
+#+begin_src emacs-lisp :tangle yes
+(use-package spacemacs-common
+    :ensure spacemacs-theme
+    :if window-system
+    :config
+    (load-theme 'spacemacs-dark t)
+    (set-face-attribute 'default nil :font "Consolas-10"))
+#+end_src
+
+** enable Y/N answer
+#+begin_src emacs-lisp :tangle yes
+(fset 'yes-or-no-p 'y-or-n-p)
+#+end_src
+
+
 
 ** ivy                                                            :edit:ivy:
 use ivy fuzzy search (except in swiper) and flx package for better sorting
@@ -191,7 +175,7 @@ bind search hotkey to swiper
 #+begin_src emacs-lisp :tangle yes
 (use-package swiper
     :defer t
-    :bind ("C-s" . 'swiper))
+    :bind ("C-s" . swiper))
 #+end_src
 
 ** counsel                                                             :ivy:
@@ -229,8 +213,8 @@ understand what all areas stand for
 #+end_src
 
 * DONE Editor
-** curson position highlighting                                       :edit:
-#+begin_src emacs-lisp :tangle yes
+** TODO FAIL curson position highlighting                                       :edit:
+#+begin_src emacs-lisp :tangle no
 (use-package beacon
     :defer t
     :config (beacon-mode 1))
@@ -262,7 +246,7 @@ There is smartparens mode worth noting.
 ** trailing space                                                     :edit:
 auto remove on save
 
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp :tangle no
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 #+end_src
 
@@ -292,7 +276,7 @@ global keybind will be shadowed by local mode keymap
 #+end_src
 
 ** undo-tree                                                          :edit:
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp :tangle no
 (use-package undo-tree
     :diminish undo-tree-mode
     :defer t
@@ -304,7 +288,7 @@ global keybind will be shadowed by local mode keymap
 ** prelude-like C-a behavior                                          :edit:
 first press to the non-whitespace char of a line and then to beginning
 shadowed by org-beginning-of-line in org-mode
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp :tangle no
 (defun smarter-move-beginning-of-line (arg)
   (interactive "^p")
   (setq arg (or arg 1))
@@ -324,7 +308,7 @@ shadowed by org-beginning-of-line in org-mode
 #+end_src
 
 ** global auto revert mode                                            :edit:
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp :tangle no
 (global-auto-revert-mode t)
 #+end_src
 
@@ -410,7 +394,7 @@ possible sublime-like fuzzy completion
 need to input no candidate words
 input ignore casing
 
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp :tangle no
 (use-package company
     :defer 10
     :init (add-hook 'after-init-hook 'global-company-mode)
@@ -488,7 +472,7 @@ build.bat is to be created
 ** WIP helm                                                           :helm:
 helm-ag for searching
 helm window in split windows
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp :tangle no
 (use-package helm
     :config
     (setq helm-split-window-in-side-p t))
@@ -498,7 +482,7 @@ helm window in split windows
 ** add org agenda path to custom settings                              :org:
 this one is system-specific and should be defined in the custom settings
 
-#+begin_src emacs-lisp :tangle no
+#+begin_src emacs-lisp :tangle yes
 (setq org-agenda-files '("~/org"))
 #+end_src
 
